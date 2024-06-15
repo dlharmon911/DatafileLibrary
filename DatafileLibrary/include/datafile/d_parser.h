@@ -1,14 +1,14 @@
 #ifndef _DATAFILE_DATAFILE_TYPES_H_
 #define _DATAFILE_DATAFILE_TYPES_H_
 
-#include "datafile\d_dson.h"
-#include "datafile\d_string.h"
+#include "datafile/d_dson.h"
+#include "datafile/d_string.h"
 
-namespace datafile
+namespace dh
 {
 	enum element_type
 	{
-		datafile = 0,
+		dh = 0,
 		bitmap,
 		font,
 		text,

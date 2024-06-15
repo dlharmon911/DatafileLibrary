@@ -1,7 +1,7 @@
-#include "datafile\d_string.h"
-#include "datafile\d_config.h"
+#include "datafile/d_string.h"
+#include "datafile/d_config.h"
 
-namespace datafile
+namespace dh
 {
 	namespace config
 	{

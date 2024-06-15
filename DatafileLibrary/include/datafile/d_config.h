@@ -3,7 +3,7 @@
 
 #include "d_dson.h"
 
-namespace datafile
+namespace dh
 {
 	using config_t = dson_t;
 

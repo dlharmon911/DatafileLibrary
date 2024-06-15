@@ -2,12 +2,12 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
-#include "datafile\d_parser.h"
-#include "datafile\d_path.h"
-#include "datafile\d_string.h"
-#include "datafile\d_config.h"
+#include "datafile/d_parser.h"
+#include "datafile/d_path.h"
+#include "datafile/d_string.h"
+#include "datafile/d_config.h"
 
-namespace datafile
+namespace dh
 {
 	namespace parser
 	{

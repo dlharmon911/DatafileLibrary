@@ -1,7 +1,7 @@
 #include <ctime>
 #include "datafile/d_system.h"
 
-namespace datafile
+namespace dh
 {
 	namespace system
 	{

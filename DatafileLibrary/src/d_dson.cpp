@@ -5,10 +5,10 @@
 #include <sstream>
 #include <string>
 #include <allegro5\allegro5.h>
-#include "datafile\d_string.h"
-#include "datafile\d_dson.h"
+#include "datafile/d_string.h"
+#include "datafile/d_dson.h"
 
-namespace datafile
+namespace dh
 {
 	using file_t = ALLEGRO_FILE;
 
@@ -43,7 +43,7 @@ namespace datafile
 
 	template <> bool dson_t::get_as(const size_t nItem) const
 	{
-		return datafile::string::to_lower(this->get_string(nItem)) == "true";
+		return dh::string::to_lower(this->get_string(nItem)) == "true";
 	}
 
 	template <>

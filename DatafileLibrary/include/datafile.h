@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-namespace datafile
+namespace dh
 {
 	class datafile_t
 	{
@@ -125,8 +125,8 @@ typedef struct ALLEGRO_DATAFILE
 	int32_t type;
 } ALLEGRO_DATAFILE;
 
-bool write_header_file(const char* manifest_filename, const char* header_filename, const char sListSep = ',');
+bool al_generate_header_file(const char* manifest_filename, const char* header_filename, const char sListSep = ',');
 ALLEGRO_DATAFILE* al_load_datafile(const char* filename, const char sListSep = ',');
-void al_destroy_datafile(ALLEGRO_DATAFILE* datafile);
+void al_destroy_datafile(ALLEGRO_DATAFILE* dh);
 
 #endif // !_ALLEGRO_DATAFILE_H_

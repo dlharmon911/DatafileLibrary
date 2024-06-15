@@ -59,7 +59,7 @@
 #include <unordered_map>
 #include <string>
 
-namespace datafile
+namespace dh
 {
 	class dson_t
 	{

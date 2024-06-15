@@ -7,15 +7,15 @@
 #include <vector>
 #include <algorithm>
 #include <map>
-#include "datafile\d_string.h"
-#include "datafile\d_config.h"
-#include "datafile\d_dson.h"
-#include "datafile\d_path.h"
-#include "datafile\d_parser.h"
-#include "datafile\d_system.h"
+#include "datafile/d_string.h"
+#include "datafile/d_config.h"
+#include "datafile/d_dson.h"
+#include "datafile/d_path.h"
+#include "datafile/d_parser.h"
+#include "datafile/d_system.h"
 #include "datafile.h"
 
-namespace datafile
+namespace dh
 {
 	void* object_parser_datafile(const parser::data_t& data);
 	void* object_parser_bitmap(const parser::data_t& data);
@@ -32,9 +32,9 @@ namespace datafile
 		parser::deleter_t deleter = nullptr;
 	} object_type_info_t;
 
-	void destroy_datafile(datafile_t* datafile)
+	void destroy_datafile(datafile_t* dh)
 	{
-		if (datafile) delete datafile;
+		if (dh) delete dh;
 	}
 
 	void destroy_cstring(std::string* str)
@@ -84,7 +84,7 @@ namespace datafile
 			parser::register_object_type(element_type::bitmap, "bitmap", (parser::parser_t)object_parser_bitmap, (parser::deleter_t)al_destroy_bitmap);
 			parser::register_object_type(element_type::font, "font", (parser::parser_t)object_parser_font, (parser::deleter_t)al_destroy_font);
 			parser::register_object_type(element_type::text, "text", (parser::parser_t)object_parser_text, (parser::deleter_t)destroy_cstring);
-			parser::register_object_type(element_type::datafile, "datafile", (parser::parser_t)object_parser_datafile, (parser::deleter_t)destroy_datafile);
+			parser::register_object_type(element_type::dh, "dh", (parser::parser_t)object_parser_datafile, (parser::deleter_t)destroy_datafile);
 		}
 		m_initialized = true;
 	}
@@ -136,7 +136,7 @@ namespace datafile
 
 	datafile_t* read(const dson_t& dson, config_t& config)
 	{
-		datafile_t* datafile = nullptr;
+		datafile_t* dh = nullptr;
 
 		auto i = dson.cbegin();
 		dson_t output;
@@ -145,10 +145,10 @@ namespace datafile
 		{
 			parser::data_t data((*i), config);
 
-			datafile = (datafile_t*)object_parser_datafile(data);
+			dh = (datafile_t*)object_parser_datafile(data);
 		}
 
-		return datafile;
+		return dh;
 	}
 
 	datafile_t* read(const std::string& filename, const char sListSep)
@@ -256,9 +256,9 @@ namespace datafile
 	void* object_parser_datafile(const parser::data_t& data)
 	{
 		bool error = false;
-		datafile_t* datafile = new datafile_t();
+		datafile_t* dh = new datafile_t();
 
-		if (datafile)
+		if (dh)
 		{
 			int32_t nested = 0;
 
@@ -304,22 +304,22 @@ namespace datafile
 							break;
 						}
 
-						datafile->push_back(type, string::to_upper(oname), result);
+						dh->push_back(type, string::to_upper(oname), result);
 					}
 				}
 			}
 		}
 
-		if (datafile)
+		if (dh)
 		{
 			if (error)
 			{
-				delete datafile;
-				datafile = nullptr;
+				delete dh;
+				dh = nullptr;
 			}
 		}
 
-		return datafile;
+		return dh;
 	}
 
 	bool write_header_object(ALLEGRO_FILE* pfile, const dson_t& dson, std::vector<std::string>& header, const std::string& name, int32_t& n)
@@ -356,15 +356,15 @@ namespace datafile
 			write_header_object(pfile, dson[key], header, key, n);
 			header.pop_back();
 
-			if (key == "datafile")
+			if (key == "dh")
 			{
 				int32_t n = 0;
-				const dson_t& datafile = dson[key];
+				const dson_t& dh = dson[key];
 
-				for (auto j = datafile.cbegin(); j != datafile.cend(); ++j)
+				for (auto j = dh.cbegin(); j != dh.cend(); ++j)
 				{
 					header.push_back(j.key());
-					write_header_datafile(pfile, datafile, header, n);
+					write_header_datafile(pfile, dh, header, n);
 					header.pop_back();
 				}
 			}
@@ -423,18 +423,18 @@ namespace datafile
 
 	datafile_t* load_from_archive_file(const std::string& filename, const char sListSep)
 	{
-		datafile_t* datafile = nullptr;
+		datafile_t* dh = nullptr;
 		const ALLEGRO_FS_INTERFACE* interface = al_get_fs_interface();
 
 		if (PHYSFS_mount(filename.c_str(), NULL, 1))
 		{
 			al_set_physfs_file_interface();
-			datafile = read("index.ini", sListSep);
+			dh = read("index.ini", sListSep);
 			PHYSFS_unmount(filename.c_str());
 		}
 
 		al_set_fs_interface(interface);
-		return datafile;
+		return dh;
 	}
 
 	datafile_t* load_from_index_file(const std::string& filename, const char sListSep)
@@ -496,38 +496,38 @@ namespace datafile
 	{
 		size_t size = dv->size();
 		size_t index = 0;
-		ALLEGRO_DATAFILE* datafile = new ALLEGRO_DATAFILE[size + 1];
+		ALLEGRO_DATAFILE* dh = new ALLEGRO_DATAFILE[size + 1];
 		bool error = false;
 
 		for (auto o = dv->begin(); o != dv->end(); ++o)
 		{
-			datafile[index].type = o.type();
-			datafile[index].data = o.data();
+			dh[index].type = o.type();
+			dh[index].data = o.data();
 
-			if (o.type() == datafile::element_type::datafile)
+			if (o.type() == dh::element_type::dh)
 			{
-				datafile[index].data = (void*)convert_to_allegro_datafile((datafile_t*)(o.data()));
-				if (!datafile[index].data)
+				dh[index].data = (void*)convert_to_allegro_datafile((datafile_t*)(o.data()));
+				if (!dh[index].data)
 				{
-					al_destroy_datafile(datafile);
+					al_destroy_datafile(dh);
 					return nullptr;
 				}
 			}
 			++index;
 		}
 
-		datafile[size].data = nullptr;
-		datafile[size].type = 0;
+		dh[size].data = nullptr;
+		dh[size].type = 0;
 
-		return datafile;
+		return dh;
 	}
 }
 
-bool write_header_file(const char* manifest_filename, const char* header_filename, const char sListSep)
+bool al_generate_header_file(const char* manifest_filename, const char* header_filename, const char sListSep)
 {
-	datafile::dson_t dson;
+	dh::dson_t dson;
 
-	if (datafile::dson_t::read(dson, manifest_filename, sListSep))
+	if (dh::dson_t::read(dson, manifest_filename, sListSep))
 	{
 		return write_header(dson, manifest_filename, header_filename);
 	}
@@ -537,29 +537,29 @@ bool write_header_file(const char* manifest_filename, const char* header_filenam
 
 ALLEGRO_DATAFILE* al_load_datafile(const char* filename, const char sListSep)
 {
-	datafile::datafile_t* dv = datafile::load_datafile(filename, sListSep);
+	dh::datafile_t* dv = dh::load_datafile(filename, sListSep);
 
 	if (dv)
 	{
-		return datafile::convert_to_allegro_datafile(dv);
+		return dh::convert_to_allegro_datafile(dv);
 		delete dv;
 	}
 
 	return nullptr;
 }
 
-void al_destroy_datafile(ALLEGRO_DATAFILE* datafile)
+void al_destroy_datafile(ALLEGRO_DATAFILE* dh)
 {
-	if (datafile)
+	if (dh)
 	{
-		ALLEGRO_DATAFILE* object = datafile;
+		ALLEGRO_DATAFILE* object = dh;
 		while (object->data)
 		{
-			datafile::parser::deleter_t deleter = datafile::parser::get_deleter(object->type);
+			dh::parser::deleter_t deleter = dh::parser::get_deleter(object->type);
 
-			if (object->type == datafile::element_type::datafile)
+			if (object->type == dh::element_type::dh)
 			{
-				deleter = (datafile::parser::deleter_t)al_destroy_datafile;
+				deleter = (dh::parser::deleter_t)al_destroy_datafile;
 			}
 
 			deleter(object->data);
@@ -567,7 +567,7 @@ void al_destroy_datafile(ALLEGRO_DATAFILE* datafile)
 			++object;
 		}
 
-		delete[] datafile;
+		delete[] dh;
 	}
 }
 

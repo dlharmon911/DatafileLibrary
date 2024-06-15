@@ -1,6 +1,6 @@
-#include "datafile\d_string.h"
+#include "datafile/d_string.h"
 
-namespace datafile
+namespace dh
 {
 	namespace string
 	{
