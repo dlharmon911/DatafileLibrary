@@ -127,6 +127,7 @@ typedef struct ALLEGRO_DATAFILE
 
 bool al_generate_header_file(const char* manifest_filename, const char* header_filename, const char sListSep = ',');
 ALLEGRO_DATAFILE* al_load_datafile(const char* filename, const char sListSep = ',');
+ALLEGRO_DATAFILE* al_convert_to_allegro_datafile(dh::datafile_t* dv);
 void al_destroy_datafile(ALLEGRO_DATAFILE* dh);
 
 #endif // !_ALLEGRO_DATAFILE_H_

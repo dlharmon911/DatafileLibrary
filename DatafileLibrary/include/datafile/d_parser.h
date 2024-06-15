@@ -8,7 +8,7 @@ namespace dh
 {
 	enum element_type
 	{
-		dh = 0,
+		datafile = 0,
 		bitmap,
 		font,
 		text,
