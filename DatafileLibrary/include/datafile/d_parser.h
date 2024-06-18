@@ -1,10 +1,10 @@
-#ifndef _DATAFILE_DATAFILE_TYPES_H_
-#define _DATAFILE_DATAFILE_TYPES_H_
+#ifndef _DLH_PARSER_H_
+#define _DLH_PARSER_H_
 
 #include "datafile/d_dson.h"
 #include "datafile/d_string.h"
 
-namespace dh
+namespace dlh
 {
 	enum element_type
 	{
@@ -79,4 +79,4 @@ namespace dh
 	}
 }
 
-#endif // !_DATAFILE_DATAFILE_TYPES_H_
+#endif // !_DLH_PARSER_H_

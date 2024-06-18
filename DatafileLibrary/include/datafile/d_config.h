@@ -1,9 +1,9 @@
-#ifndef _DATAFILE_CONFIG_H_
-#define _DATAFILE_CONFIG_H_
+#ifndef _DLH_CONFIG_H_
+#define _DLH_CONFIG_H_
 
 #include "d_dson.h"
 
-namespace dh
+namespace dlh
 {
 	using config_t = dson_t;
 
@@ -30,4 +30,4 @@ namespace dh
 	}
 }
 
-#endif // !_DATAFILE_CONFIG_H_
+#endif // !_DLH_CONFIG_H_

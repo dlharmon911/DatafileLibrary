@@ -1,7 +1,7 @@
 #include <allegro5/allegro5.h>
 #include "datafile/d_path.h"
 
-namespace dh
+namespace dlh
 {
 	namespace path
 	{

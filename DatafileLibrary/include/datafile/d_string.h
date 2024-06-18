@@ -1,10 +1,10 @@
-#ifndef _DATAFILE_STRING_H_
-#define _DATAFILE_STRING_H_
+#ifndef _DLH_STRING_H_
+#define _DLH_STRING_H_
 
 #include <vector>
 #include <string>
 
-namespace dh
+namespace dlh
 {
 	namespace string
 	{
@@ -15,4 +15,4 @@ namespace dh
 	}
 }
 
-#endif // !_DATAFILE_STRING_H_
+#endif // !_DLH_STRING_H_

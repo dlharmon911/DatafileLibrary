@@ -90,10 +90,10 @@ int init(int argc, char** argv)
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
 	al_register_event_source(event_queue, al_get_mouse_event_source());
 
-	if (!al_generate_header_file("data\\index.ini", "include\\data.h"))
-	{
-		return -1;
-	}
+	//if (!al_generate_header_file("data\\index.ini", "include\\data.h"))
+	//{
+	//	return -1;
+	//}
 
 	data = al_load_datafile("data\\index.ini");
 

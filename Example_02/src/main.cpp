@@ -70,7 +70,7 @@ int init(int argc, char** argv)
 	}
 
 	al_set_new_display_flags(ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE);
-	al_set_new_window_title("Datafile Library - Example 01");
+	al_set_new_window_title("Datafile Library - Example 02");
 	display = al_create_display(DEFAULT_DISPLAY_FULLSCREEN_WIDTH, DEFAULT_DISPLAY_FULLSCREEN_HEIGHT);
 	if (!display)
 	{
@@ -94,10 +94,10 @@ int init(int argc, char** argv)
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
 	al_register_event_source(event_queue, al_get_mouse_event_source());
 
-	if (!al_generate_header_file("data.7z", "include/data.h"))
-	{
-		return -1;
-	}
+	//if (!al_generate_header_file("data.7z", "include/data.h"))
+	//{
+	//	return -1;
+	//}
 
 	data = al_load_datafile("data.7z");
 

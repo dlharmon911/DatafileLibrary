@@ -1,22 +1,24 @@
-#ifndef _ALLEGRO_DATAFILE_H_
-#define _ALLEGRO_DATAFILE_H_
+#ifndef _ALLEGRO_DLH_H_
+#define _ALLEGRO_DLH_H_
 
+#include <allegro5/allegro5.h>
 #include <vector>
+#include <utility>
 #include <string>
+#include "datafile/d_parser.h"
 
-namespace dh
+namespace dlh
 {
 	class datafile_t
 	{
 	public:
-		typedef struct item_t
-		{
-			int32_t type;
-			std::string name;
-		} item_t;
+		using item_t = std::pair<int32_t, std::string>;
 
 		datafile_t();
 		~datafile_t();
+
+		static datafile_t* load(const std::string& filename, const char sListSep = ',');
+
 		size_t size() const;
 		bool is_empty() const;
 		void clear();
@@ -24,14 +26,14 @@ namespace dh
 		template <typename T>
 		T get(size_t index)
 		{
-			assert(index < this->m_object_data.size());
+			ALLEGRO_ASSERT(index < this->m_object_data.size());
 			return (T)this->m_object_data[index];
 		}
 
 		template <typename T>
 		const T get(size_t index) const
 		{
-			assert(index < this->m_object_data.size());
+			ALLEGRO_ASSERT(index < this->m_object_data.size());
 			return (T)this->m_object_data[index];
 		}
 
@@ -59,8 +61,8 @@ namespace dh
 			typedef std::ptrdiff_t difference_type;
 
 			iterator(std::vector<void*>::iterator o, std::vector<item_t>::iterator e) : m_o(o), m_e(e) {}
-			int32_t type() const { return this->m_e->type; }
-			std::string name() const { return this->m_e->name; }
+			int32_t type() const { return this->m_e->first; }
+			std::string name() const { return this->m_e->second; }
 			pointer_type data() { return (pointer_type)(*this->m_o); }
 
 			bool operator == (const iterator& it) const { return (this->m_o == it.m_o && this->m_e == it.m_e); }
@@ -88,8 +90,8 @@ namespace dh
 			typedef std::ptrdiff_t difference_type;
 
 			const_iterator(std::vector<void*>::const_iterator o, std::vector<item_t>::const_iterator e) : m_o(o), m_e(e) {}
-			int32_t type() const { return this->m_e->type; }
-			std::string name() const { return this->m_e->name; }
+			int32_t type() const { return this->m_e->first; }
+			std::string name() const { return this->m_e->second; }
 			pointer_type data() const { return (pointer_type)(*this->m_o); }
 
 			bool operator == (const const_iterator& it) const { return (this->m_o == it.m_o && this->m_e == it.m_e); }
@@ -115,8 +117,6 @@ namespace dh
 		std::vector<void*> m_object_data;
 		std::vector<item_t> m_element_data;
 	};
-
-	datafile_t* load_datafile(const std::string& filename, const char sListSep = ',');
 }
 
 typedef struct ALLEGRO_DATAFILE
@@ -127,7 +127,7 @@ typedef struct ALLEGRO_DATAFILE
 
 bool al_generate_header_file(const char* manifest_filename, const char* header_filename, const char sListSep = ',');
 ALLEGRO_DATAFILE* al_load_datafile(const char* filename, const char sListSep = ',');
-ALLEGRO_DATAFILE* al_convert_to_allegro_datafile(dh::datafile_t* dv);
-void al_destroy_datafile(ALLEGRO_DATAFILE* dh);
+ALLEGRO_DATAFILE* al_convert_to_allegro_datafile(dlh::datafile_t* dv);
+void al_destroy_datafile(ALLEGRO_DATAFILE* dlh);
 
-#endif // !_ALLEGRO_DATAFILE_H_
+#endif // !_ALLEGRO_DLH_H_

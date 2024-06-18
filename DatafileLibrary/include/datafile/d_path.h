@@ -1,10 +1,10 @@
-#ifndef _DATAFILE_PATH_H_
-#define _DATAFILE_PATH_H_
+#ifndef _DLH_PATH_H_
+#define _DLH_PATH_H_
 
 #include <vector>
 #include <string>
 
-namespace dh
+namespace dlh
 {
 	namespace path
 	{
@@ -18,4 +18,4 @@ namespace dh
 	}
 }
 
-#endif // !_DATAFILE_PATH_H_
+#endif // !_DLH_PATH_H_

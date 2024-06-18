@@ -52,14 +52,14 @@
 
 */
 
-#ifndef _DATAFILE_DSON_H_
-#define _DATAFILE_DSON_H_
+#ifndef _DLH_DSON_H_
+#define _DLH_DSON_H_
 
 #include <vector>
 #include <unordered_map>
 #include <string>
 
-namespace dh
+namespace dlh
 {
 	class dson_t
 	{
@@ -166,4 +166,4 @@ namespace dh
 	};
 }
 
-#endif // !_DATAFILE_DSON_H_
+#endif // !_DLH_DSON_H_

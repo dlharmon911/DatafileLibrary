@@ -8,7 +8,7 @@
 #include "datafile/d_string.h"
 #include "datafile/d_dson.h"
 
-namespace dh
+namespace dlh
 {
 	using file_t = ALLEGRO_FILE;
 
@@ -43,7 +43,7 @@ namespace dh
 
 	template <> bool dson_t::get_as(const size_t nItem) const
 	{
-		return dh::string::to_lower(this->get_string(nItem)) == "true";
+		return dlh::string::to_lower(this->get_string(nItem)) == "true";
 	}
 
 	template <>

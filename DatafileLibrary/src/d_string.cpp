@@ -1,6 +1,6 @@
 #include "datafile/d_string.h"
 
-namespace dh
+namespace dlh
 {
 	namespace string
 	{
