@@ -39,6 +39,12 @@
     <ClCompile Include="src\d_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\d_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\d_object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\datafile.h">
@@ -60,6 +66,15 @@
       <Filter>Header Files\Datafile Files</Filter>
     </ClInclude>
     <ClInclude Include="include\datafile\d_system.h">
+      <Filter>Header Files\Datafile Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\al_datafile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\datafile\d_data.h">
+      <Filter>Header Files\Datafile Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\datafile\d_object.h">
       <Filter>Header Files\Datafile Files</Filter>
     </ClInclude>
   </ItemGroup>

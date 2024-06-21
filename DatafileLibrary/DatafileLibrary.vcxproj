@@ -143,18 +143,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\d_data.cpp" />
     <ClCompile Include="src\d_config.cpp" />
     <ClCompile Include="src\d_datafile.cpp" />
     <ClCompile Include="src\d_dson.cpp" />
+    <ClCompile Include="src\d_object.cpp" />
     <ClCompile Include="src\d_parser.cpp" />
     <ClCompile Include="src\d_path.cpp" />
     <ClCompile Include="src\d_string.cpp" />
     <ClCompile Include="src\d_system.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\al_datafile.h" />
     <ClInclude Include="include\datafile.h" />
+    <ClInclude Include="include\datafile\d_data.h" />
     <ClInclude Include="include\datafile\d_config.h" />
     <ClInclude Include="include\datafile\d_dson.h" />
+    <ClInclude Include="include\datafile\d_object.h" />
     <ClInclude Include="include\datafile\d_parser.h" />
     <ClInclude Include="include\datafile\d_path.h" />
     <ClInclude Include="include\datafile\d_string.h" />

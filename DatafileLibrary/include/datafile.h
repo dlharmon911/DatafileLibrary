@@ -1,11 +1,11 @@
-#ifndef _ALLEGRO_DLH_H_
-#define _ALLEGRO_DLH_H_
+#ifndef _DLH_DATAFILE_H_
+#define _DLH_DATAFILE_H_
 
 #include <allegro5/allegro5.h>
 #include <vector>
 #include <utility>
 #include <string>
-#include "datafile/d_parser.h"
+#include "al_datafile.h"
 
 namespace dlh
 {
@@ -18,6 +18,7 @@ namespace dlh
 		~datafile_t();
 
 		static datafile_t* load(const std::string& filename, const char sListSep = ',');
+		static ALLEGRO_DATAFILE* al_convert_to_allegro_datafile(dlh::datafile_t* dv);
 
 		size_t size() const;
 		bool is_empty() const;
@@ -119,15 +120,4 @@ namespace dlh
 	};
 }
 
-typedef struct ALLEGRO_DATAFILE
-{
-	void* data;
-	int32_t type;
-} ALLEGRO_DATAFILE;
-
-bool al_generate_header_file(const char* manifest_filename, const char* header_filename, const char sListSep = ',');
-ALLEGRO_DATAFILE* al_load_datafile(const char* filename, const char sListSep = ',');
-ALLEGRO_DATAFILE* al_convert_to_allegro_datafile(dlh::datafile_t* dv);
-void al_destroy_datafile(ALLEGRO_DATAFILE* dlh);
-
-#endif // !_ALLEGRO_DLH_H_
+#endif // !_DLH_DATAFILE_H_

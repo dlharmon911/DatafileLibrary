@@ -1,3 +1,11 @@
+#include <allegro5/allegro5.h>
+#include <allegro5\allegro_physfs.h>
+#include <physfs.h>
+#include <map>
+#include "datafile/d_path.h"
+#include "datafile/d_string.h"
+#include "datafile/d_object.h"
+#include "datafile/d_parser.h"
 #include "datafile.h"
 
 namespace dlh
@@ -77,5 +85,101 @@ namespace dlh
 	datafile_t::const_iterator datafile_t::cend()
 	{
 		return datafile_t::const_iterator(this->m_object_data.cend(), this->m_element_data.cend());
+	}
+
+
+	datafile_t* datafile_t::load(const std::string& filename, const char sListSep)
+	{
+		datafile_t* dv = nullptr;
+		std::string filepath = path::make_canonical(filename);
+		std::string base;
+		std::string ext;
+		std::string path;
+
+		filepath = dlh::path::make_canonical(filename);
+		dlh::path::split_filepath(filepath, path, base, ext);
+
+		bool archive = false;
+
+		const PHYSFS_ArchiveInfo** i = nullptr;
+		for (i = PHYSFS_supportedArchiveTypes(); *i != NULL; i++)
+		{
+			if (string::to_upper(ext) == (*i)->extension)
+			{
+				archive = true;
+				break;
+			}
+		}
+
+		if (archive)
+		{
+			const ALLEGRO_FILE_INTERFACE* file_interface = al_get_new_file_interface();
+
+			if (PHYSFS_mount(filename.c_str(), NULL, 1))
+			{
+				al_set_physfs_file_interface();
+				dv = datafile::parser::parse("index.ini", sListSep);
+				PHYSFS_unmount(filename.c_str());
+			}
+
+			al_set_new_file_interface(file_interface);
+		}
+		else
+		{
+			std::string dir = al_get_current_directory();
+
+			al_change_directory((dir + ALLEGRO_NATIVE_PATH_SEP + path).c_str());
+			dv = datafile::parser::parse(base + "." + ext, sListSep);
+			al_change_directory(dir.c_str());
+		}
+
+		return dv;
+	}
+
+	ALLEGRO_DATAFILE* datafile_t::al_convert_to_allegro_datafile(dlh::datafile_t* dv)
+	{
+		ALLEGRO_DATAFILE* rv = nullptr;
+
+		if (dv)
+		{
+			size_t size = dv->size();
+			size_t index = 0;
+			bool error = false;
+
+			rv = new ALLEGRO_DATAFILE[size + 1];
+
+			if (rv)
+			{
+				for (auto o = dv->begin(); o != dv->end(); ++o)
+				{
+					rv[index].type = o.type();
+					rv[index].data = o.data();
+
+					if (o.type() == dlh::datafile::object::type_t::datafile)
+					{
+						rv[index].data = (void*)al_convert_to_allegro_datafile((dlh::datafile_t*)(o.data()));
+						if (!rv[index].data)
+						{
+							al_destroy_datafile(rv);
+							error = true;
+							size = index;
+							break;
+						}
+					}
+					++index;
+				}
+
+				rv[size].data = nullptr;
+				rv[size].type = 0;
+
+				if (error)
+				{
+					al_destroy_datafile(rv);
+					rv = nullptr;
+				}
+			}
+		}
+
+		return rv;
 	}
 }

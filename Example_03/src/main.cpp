@@ -8,6 +8,7 @@ index.ini generates a datafile with a custome object type
 #include <allegro5/allegro_physfs.h>
 #include <physfs.h>
 #include "datafile.h"
+#include "datafile/d_parser.h"
 #include "datafile/d_path.h"
 #include "data.h"
 
@@ -36,14 +37,14 @@ typedef struct tilesheet_t
 	dim_t m_grid;
 } tilesheet_t;
 
-void* parse_tilesheet(const dlh::parser::data_t& data);
+void* parse_tilesheet(const dlh::datafile::data_t& data);
 void destroy_tilesheet(void* tilesheet);
 
-int32_t parse_bitmap(tilesheet_t* t, const dlh::parser::data_t& data)
+int32_t parse_bitmap(tilesheet_t* t, const dlh::datafile::data_t& data)
 {
 	if (data.contains("file"))
 	{
-		const dlh::parser::data_t node = data.get_child("file");
+		const dlh::datafile::data_t node = data.get_child("file");
 
 		if (!node.has_content())
 		{
@@ -71,7 +72,7 @@ int32_t parse_bitmap(tilesheet_t* t, const dlh::parser::data_t& data)
 
 		if (data.contains("masked"))
 		{
-			const dlh::parser::data_t node_masked = data.get_child("masked");
+			const dlh::datafile::data_t node_masked = data.get_child("masked");
 
 			if (!node_masked.has_content())
 			{
@@ -93,11 +94,11 @@ int32_t parse_bitmap(tilesheet_t* t, const dlh::parser::data_t& data)
 	return 0;
 }
 
-int32_t parse_tile_dimensions(tilesheet_t* t, const dlh::parser::data_t& data)
+int32_t parse_tile_dimensions(tilesheet_t* t, const dlh::datafile::data_t& data)
 {
 	if (data.contains("width"))
 	{
-		const dlh::parser::data_t node = data.get_child("width");
+		const dlh::datafile::data_t node = data.get_child("width");
 
 		if (!node.has_content())
 		{
@@ -113,7 +114,7 @@ int32_t parse_tile_dimensions(tilesheet_t* t, const dlh::parser::data_t& data)
 
 	if (data.contains("height"))
 	{
-		const dlh::parser::data_t node = data.get_child("height");
+		const dlh::datafile::data_t node = data.get_child("height");
 
 		if (!node.has_content())
 		{
@@ -130,11 +131,11 @@ int32_t parse_tile_dimensions(tilesheet_t* t, const dlh::parser::data_t& data)
 	return 0;
 }
 
-int32_t parse_grid_dimensions(tilesheet_t* t, const dlh::parser::data_t& data)
+int32_t parse_grid_dimensions(tilesheet_t* t, const dlh::datafile::data_t& data)
 {
 	if (data.contains("width"))
 	{
-		const dlh::parser::data_t node = data.get_child("width");
+		const dlh::datafile::data_t node = data.get_child("width");
 
 		if (!node.has_content())
 		{
@@ -150,7 +151,7 @@ int32_t parse_grid_dimensions(tilesheet_t* t, const dlh::parser::data_t& data)
 
 	if (data.contains("height"))
 	{
-		const dlh::parser::data_t node = data.get_child("height");
+		const dlh::datafile::data_t node = data.get_child("height");
 
 		if (!node.has_content())
 		{
@@ -168,11 +169,11 @@ int32_t parse_grid_dimensions(tilesheet_t* t, const dlh::parser::data_t& data)
 }
 
 
-int32_t parse(tilesheet_t* t, const dlh::parser::data_t& data)
+int32_t parse(tilesheet_t* t, const dlh::datafile::data_t& data)
 {
 	if (data.contains("bitmap"))
 	{
-		const dlh::parser::data_t node = data.get_child("bitmap");
+		const dlh::datafile::data_t node = data.get_child("bitmap");
 		
 		if (parse_bitmap(t, node) < 0)
 		{
@@ -186,7 +187,7 @@ int32_t parse(tilesheet_t* t, const dlh::parser::data_t& data)
 
 	if (data.contains("tile"))
 	{
-		const dlh::parser::data_t node = data.get_child("tile");
+		const dlh::datafile::data_t node = data.get_child("tile");
 
 		if (parse_tile_dimensions(t, node) < 0)
 		{
@@ -200,7 +201,7 @@ int32_t parse(tilesheet_t* t, const dlh::parser::data_t& data)
 
 	if (data.contains("grid"))
 	{
-		const dlh::parser::data_t node = data.get_child("grid");
+		const dlh::datafile::data_t node = data.get_child("grid");
 
 		if (parse_grid_dimensions(t, node) < 0)
 		{
@@ -215,7 +216,7 @@ int32_t parse(tilesheet_t* t, const dlh::parser::data_t& data)
 	return 0;
 }
 
-void* parse_tilesheet(const dlh::parser::data_t& data)
+void* parse_tilesheet(const dlh::datafile::data_t& data)
 {
 	tilesheet_t* t = new tilesheet_t;
 
@@ -317,7 +318,7 @@ int init(int argc, char** argv)
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
 	al_register_event_source(event_queue, al_get_mouse_event_source());
 
-	dlh::parser::register_object_type(dlh::element_type::user_defined, "tilesheet", parse_tilesheet, destroy_tilesheet);
+	dlh::datafile::object::register_type(dlh::datafile::object::type_t::user_defined, "tilesheet", parse_tilesheet, destroy_tilesheet);
 
 	if (!al_generate_header_file("data\\index.ini", "include\\data.h"))
 	{
