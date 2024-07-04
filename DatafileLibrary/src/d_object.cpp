@@ -14,36 +14,28 @@ namespace dlh
 	{
 		namespace object
 		{
+			using map_info_t = std::map<int32_t, std::pair<std::string, parser_func_t>>;
+
 			map_info_t m_info;
-
-			deleter_t get_deleter(int32_t type)
-			{
-				auto d = m_info.find(type);
-				if (d != m_info.end())
-				{
-					return d->second.deleter;
-				}
-
-				return nullptr;
-			}
 
 			int32_t get_type(const std::string& name)
 			{
 				for (auto t : m_info)
 				{
-					if (name == t.second.name) return t.first;
+					if (name == t.second.first) return t.first;
 				}
 
 				return -1;
 			}
 
-			void register_type(int32_t type, const std::string& name, parser_t parser, deleter_t deleter)
+			void register_type(int32_t type, const std::string& name, parser_func_t parser)
 			{
-				m_info[type] = { name, parser, deleter };
+				m_info[type] = { name, parser };
 			}
 
-			void* datafile_parser(const data_t& data)
+			value_t datafile_parser(const data_t& data)
 			{
+				value_t rv;
 				bool error = false;
 				datafile_t* datafile = new datafile_t();
 
@@ -86,7 +78,8 @@ namespace dlh
 									break;
 								}
 
-								void* result = m_info[type].parser(on);
+								value_t result = m_info[type].second(on);
+
 								if (!result)
 								{
 									error = true;
@@ -108,11 +101,17 @@ namespace dlh
 					}
 				}
 
-				return datafile;
+				if (datafile)
+				{
+					rv.reset(datafile);
+				}
+
+				return rv;
 			}
 
-			void* bitmap_parser(const data_t& data)
+			value_t bitmap_parser(const data_t& data)
 			{
+				value_t rv;
 				ALLEGRO_BITMAP* bitmap = nullptr;
 
 				if (data.contains("file"))
@@ -161,11 +160,17 @@ namespace dlh
 					}
 				}
 
-				return (void*)bitmap;
+				if (bitmap)
+				{
+					rv.reset(bitmap, al_destroy_bitmap);
+				}
+
+				return rv;
 			}
 
-			void* font_parser(const data_t& data)
+			value_t font_parser(const data_t& data)
 			{
+				value_t rv;
 				ALLEGRO_FONT* font = nullptr;
 				if (data.contains("file"))
 				{
@@ -258,33 +263,26 @@ namespace dlh
 					}
 				}
 
-				return (void*)font;
+				if (font)
+				{
+					rv.reset(font, al_destroy_font);
+				}
+
+				return rv;
 			}
 
-			void* text_parser(const data_t& data)
+			value_t text_parser(const data_t& data)
 			{
+				value_t rv;
+
 				if (data.has_content())
 				{
-					return new std::string(data.get_string());
+					std::string* string = new std::string(data.get_string());
+
+					rv = std::static_pointer_cast<void>(std::shared_ptr<std::string>(string));
 				}
 
-				return nullptr;
-			}
-
-			void destroy_datafile(void* object)
-			{
-				if (object)
-				{
-					delete (datafile_t*)object;
-				}
-			}
-
-			void destroy_text(void* object)
-			{
-				if (object)
-				{
-					delete (std::string*)object;
-				}
+				return rv;
 			}
 		}
 	}

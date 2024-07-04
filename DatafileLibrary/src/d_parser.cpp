@@ -25,10 +25,10 @@ namespace dlh
 			{
 				if (!m_initialized)
 				{
-					datafile::object::register_type(datafile::object::type_t::bitmap, "bitmap", datafile::object::bitmap_parser, (datafile::object::deleter_t)al_destroy_bitmap);
-					datafile::object::register_type(datafile::object::type_t::font, "font", datafile::object::font_parser, (datafile::object::deleter_t)al_destroy_font);
-					datafile::object::register_type(datafile::object::type_t::text, "text", datafile::object::text_parser, datafile::object::destroy_text);
-					datafile::object::register_type(datafile::object::type_t::datafile, "datafile", datafile::object::datafile_parser, datafile::object::destroy_datafile);
+					datafile::object::register_type(datafile::object::type_t::bitmap, "bitmap", datafile::object::bitmap_parser);
+					datafile::object::register_type(datafile::object::type_t::font, "font", datafile::object::font_parser);
+					datafile::object::register_type(datafile::object::type_t::text, "text", datafile::object::text_parser);
+					datafile::object::register_type(datafile::object::type_t::datafile, "datafile", datafile::object::datafile_parser);
 				}
 				m_initialized = true;
 			}
@@ -78,9 +78,9 @@ namespace dlh
 				return 0;
 			}
 
-			datafile_t* parse(const dson_t& dson, config_t& config)
+			std::shared_ptr<datafile_t> parse(const dson_t& dson, config_t& config)
 			{
-				datafile_t* dlh = nullptr;
+				std::shared_ptr<datafile_t> rv;
 
 				auto i = dson.cbegin();
 				dson_t output;
@@ -89,13 +89,13 @@ namespace dlh
 				{
 					data_t data((*i), config);
 
-					dlh = (datafile_t*)datafile::object::datafile_parser(data);
+					rv = std::static_pointer_cast<datafile_t>(object::datafile_parser(data));
 				}
 
-				return dlh;
+				return rv;
 			}
 
-			datafile_t* parse(const std::string& filename, const char sListSep)
+			std::shared_ptr<datafile_t> parse(const std::string& filename, const char sListSep)
 			{
 				dson_t dson;
 				std::string working_path;
@@ -269,38 +269,33 @@ bool al_generate_header_file(const char* manifest_filename, const char* header_f
 	return rv;
 }
 
-ALLEGRO_DATAFILE* al_load_datafile(const char* filename, const char sListSep)
-{
-	dlh::datafile_t* dv = dlh::datafile_t::load(filename, sListSep);
-
-	if (dv)
-	{
-		return dlh::datafile_t::al_convert_to_allegro_datafile(dv);
-		delete dv;
-	}
-
-	return nullptr;
-}
-
 void al_destroy_datafile(ALLEGRO_DATAFILE* datafile)
 {
 	if (datafile)
 	{
 		ALLEGRO_DATAFILE* object = datafile;
+
 		while (object->data)
 		{
-			dlh::datafile::object::deleter_t deleter = dlh::datafile::object::get_deleter(object->type);
-
-			if (object->type == dlh::datafile::object::type_t::datafile)
-			{
-				deleter = (dlh::datafile::object::deleter_t)al_destroy_datafile;
-			}
-
-			deleter(object->data);
-			object->data = nullptr;
+			object->data.reset();
 			++object;
 		}
 
 		delete[] datafile;
 	}
 }
+
+std::shared_ptr<ALLEGRO_DATAFILE> al_load_datafile(const char* filename, const char sListSep)
+{
+	std::shared_ptr<ALLEGRO_DATAFILE> afile;
+	std::shared_ptr<dlh::datafile_t> dfile = dlh::datafile_t::load(filename, sListSep);
+
+	if (dfile)
+	{
+		afile = std::shared_ptr<ALLEGRO_DATAFILE>(dlh::datafile_t::al_convert_to_allegro_datafile(dfile), al_destroy_datafile);
+	}
+
+	return afile;
+}
+
+

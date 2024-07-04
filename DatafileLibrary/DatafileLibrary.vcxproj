@@ -159,6 +159,7 @@
     <ClInclude Include="include\datafile\d_data.h" />
     <ClInclude Include="include\datafile\d_config.h" />
     <ClInclude Include="include\datafile\d_dson.h" />
+    <ClInclude Include="include\datafile\d_memory.h" />
     <ClInclude Include="include\datafile\d_object.h" />
     <ClInclude Include="include\datafile\d_parser.h" />
     <ClInclude Include="include\datafile\d_path.h" />

@@ -3,6 +3,7 @@
 
 #include <map>
 #include "datafile/d_data.h"
+#include "datafile/d_memory.h"
 
 namespace dlh
 {
@@ -22,31 +23,16 @@ namespace dlh
 				};
 			}
 
-			using deleter_t = void (*)(void*);
-			using parser_t = void* (*)(const data_t& data);
+			using value_t = std::shared_ptr<void>;
+			using parser_func_t = value_t(*)(const data_t& data);
 
-			typedef struct type_info_t
-			{
-				std::string name;
-				parser_t parser = nullptr;
-				deleter_t deleter = nullptr;
-			} type_info_t;
-
-			using map_info_t = std::map<int32_t, type_info_t>;
-
-			extern map_info_t m_info;
-
-			deleter_t get_deleter(int32_t type);
 			int32_t get_type(const std::string& name);
-			void register_type(int32_t type, const std::string& name, parser_t parser, deleter_t deleter);
+			void register_type(int32_t type, const std::string& name, parser_func_t parser);
 			
-			void* datafile_parser(const data_t& data);
-			void* bitmap_parser(const data_t& data);
-			void* font_parser(const data_t& data);
-			void* text_parser(const data_t& data);
-
-			void destroy_datafile(void* object);
-			void destroy_text(void* object);
+			value_t datafile_parser(const data_t& data);
+			value_t bitmap_parser(const data_t& data);
+			value_t font_parser(const data_t& data);
+			value_t text_parser(const data_t& data);
 		}
 	}
 }

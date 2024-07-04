@@ -22,7 +22,7 @@ const float DEFAULT_DISPLAY_FULLSCREEN_HEIGHT = DEFAULT_BUFFER_HEIGHT;
 ALLEGRO_DISPLAY* display = nullptr;
 ALLEGRO_TIMER* timer = nullptr;
 ALLEGRO_EVENT_QUEUE* event_queue = nullptr;
-ALLEGRO_DATAFILE* data = nullptr;
+std::shared_ptr<dlh::datafile_t> data;
 ALLEGRO_BITMAP* buffer = nullptr;
 bool kill = false;
 
@@ -99,7 +99,7 @@ int init(int argc, char** argv)
 	//	return -1;
 	//}
 
-	data = al_load_datafile("data.7z");
+	data = dlh::datafile_t::load("data.7z");
 
 	if (!data)
 	{
@@ -118,11 +118,7 @@ void shutdown()
 		al_stop_timer(timer);
 	}
 
-	if (data)
-	{
-		al_destroy_datafile(data);
-		data = nullptr;
-	}
+	data.reset();
 
 	if (event_queue)
 	{
@@ -157,12 +153,12 @@ void shutdown()
 
 void draw()
 {
-	ALLEGRO_BITMAP* logo = (ALLEGRO_BITMAP*)data[0].data;
+	std::shared_ptr<ALLEGRO_BITMAP> logo = data.get()->get<ALLEGRO_BITMAP>(0);
 
-	al_draw_scaled_bitmap(logo,
+	al_draw_scaled_bitmap(logo.get(),
 		0.0f, 0.0f,
-		(float)al_get_bitmap_width(logo),
-		(float)al_get_bitmap_height(logo),
+		(float)al_get_bitmap_width(logo.get()),
+		(float)al_get_bitmap_height(logo.get()),
 		0.0f, 0.0f,
 		al_get_bitmap_width(buffer),
 		al_get_bitmap_height(buffer), 0);

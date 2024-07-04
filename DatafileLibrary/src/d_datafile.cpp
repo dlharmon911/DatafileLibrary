@@ -8,6 +8,8 @@
 #include "datafile/d_parser.h"
 #include "datafile.h"
 
+void al_destroy_datafile(ALLEGRO_DATAFILE* datafile);
+
 namespace dlh
 {
 	datafile_t::datafile_t() : m_object_data(), m_element_data() {}
@@ -43,25 +45,25 @@ namespace dlh
 		this->m_element_data.pop_back();
 	}
 
-	void* datafile_t::operator[](size_t index)
+	datafile_t::value_t& datafile_t::operator[](size_t index)
 	{
 		ALLEGRO_ASSERT(index < this->m_object_data.size());
 		return this->m_object_data[index];
 	}
 
-	const void* datafile_t::operator[](size_t index) const
+	const datafile_t::value_t& datafile_t::operator[](size_t index) const
 	{
 		ALLEGRO_ASSERT(index < this->m_object_data.size());
 		return this->m_object_data[index];
 	}
 
-	datafile_t::item_t& datafile_t::get_object_info(size_t index)
+	datafile_t::info_t& datafile_t::get_object_info(size_t index)
 	{
 		ALLEGRO_ASSERT(index < this->m_element_data.size());
 		return this->m_element_data[index];
 	}
 
-	const datafile_t::item_t& datafile_t::get_object_info(size_t index) const
+	const datafile_t::info_t& datafile_t::get_object_info(size_t index) const
 	{
 		ALLEGRO_ASSERT(index < this->m_element_data.size());
 		return this->m_element_data[index];
@@ -87,10 +89,9 @@ namespace dlh
 		return datafile_t::const_iterator(this->m_object_data.cend(), this->m_element_data.cend());
 	}
 
-
-	datafile_t* datafile_t::load(const std::string& filename, const char sListSep)
+	std::shared_ptr<datafile_t> datafile_t::load(const std::string& filename, const char sListSep)
 	{
-		datafile_t* dv = nullptr;
+		std::shared_ptr<datafile_t> dfile;
 		std::string filepath = path::make_canonical(filename);
 		std::string base;
 		std::string ext;
@@ -118,7 +119,7 @@ namespace dlh
 			if (PHYSFS_mount(filename.c_str(), NULL, 1))
 			{
 				al_set_physfs_file_interface();
-				dv = datafile::parser::parse("index.ini", sListSep);
+				dfile = datafile::parser::parse("index.ini", sListSep);
 				PHYSFS_unmount(filename.c_str());
 			}
 
@@ -129,20 +130,20 @@ namespace dlh
 			std::string dir = al_get_current_directory();
 
 			al_change_directory((dir + ALLEGRO_NATIVE_PATH_SEP + path).c_str());
-			dv = datafile::parser::parse(base + "." + ext, sListSep);
+			dfile = datafile::parser::parse(base + "." + ext, sListSep);
 			al_change_directory(dir.c_str());
 		}
 
-		return dv;
+		return dfile;
 	}
 
-	ALLEGRO_DATAFILE* datafile_t::al_convert_to_allegro_datafile(dlh::datafile_t* dv)
+	ALLEGRO_DATAFILE* datafile_t::al_convert_to_allegro_datafile(std::shared_ptr<dlh::datafile_t>& datafile)
 	{
 		ALLEGRO_DATAFILE* rv = nullptr;
 
-		if (dv)
+		if (datafile)
 		{
-			size_t size = dv->size();
+			size_t size = datafile->size();
 			size_t index = 0;
 			bool error = false;
 
@@ -150,14 +151,17 @@ namespace dlh
 
 			if (rv)
 			{
-				for (auto o = dv->begin(); o != dv->end(); ++o)
+				for (auto o = datafile->begin(); o != datafile->end(); ++o)
 				{
 					rv[index].type = o.type();
 					rv[index].data = o.data();
 
 					if (o.type() == dlh::datafile::object::type_t::datafile)
 					{
-						rv[index].data = (void*)al_convert_to_allegro_datafile((dlh::datafile_t*)(o.data()));
+						std::shared_ptr<datafile_t> d = std::static_pointer_cast<datafile_t>(o.data());
+
+						rv[index].data = std::static_pointer_cast<void>(std::shared_ptr<ALLEGRO_DATAFILE>(al_convert_to_allegro_datafile(d), al_destroy_datafile));
+
 						if (!rv[index].data)
 						{
 							al_destroy_datafile(rv);

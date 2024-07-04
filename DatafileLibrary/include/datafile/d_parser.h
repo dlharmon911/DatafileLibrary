@@ -5,6 +5,7 @@
 #include "datafile/d_string.h"
 #include "datafile/d_data.h"
 #include "datafile/d_object.h"
+#include "datafile/d_memory.h"
 #include "datafile.h"
 
 namespace dlh
@@ -13,7 +14,7 @@ namespace dlh
 	{
 		namespace parser
 		{
-			datafile_t* parse(const std::string& filename, const char sListSep);
+			std::shared_ptr<datafile_t> parse(const std::string& filename, const char sListSep);
 		}
 	}
 }

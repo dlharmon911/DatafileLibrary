@@ -20,7 +20,7 @@ const float DEFAULT_DISPLAY_FULLSCREEN_HEIGHT = DEFAULT_BUFFER_HEIGHT;
 ALLEGRO_DISPLAY* display = nullptr;
 ALLEGRO_TIMER* timer = nullptr;
 ALLEGRO_EVENT_QUEUE* event_queue = nullptr;
-ALLEGRO_DATAFILE* data = nullptr;
+std::shared_ptr<dlh::datafile_t> data;
 ALLEGRO_BITMAP* buffer = nullptr;
 bool kill = false;
 
@@ -37,7 +37,6 @@ typedef struct tilesheet_t
 	dim_t m_grid;
 } tilesheet_t;
 
-void* parse_tilesheet(const dlh::datafile::data_t& data);
 void destroy_tilesheet(void* tilesheet);
 
 int32_t parse_bitmap(tilesheet_t* t, const dlh::datafile::data_t& data)
@@ -216,24 +215,23 @@ int32_t parse(tilesheet_t* t, const dlh::datafile::data_t& data)
 	return 0;
 }
 
-void* parse_tilesheet(const dlh::datafile::data_t& data)
+std::shared_ptr<void> parse_tilesheet(const dlh::datafile::data_t& data)
 {
-	tilesheet_t* t = new tilesheet_t;
+	std::shared_ptr<tilesheet_t> rv = std::shared_ptr<tilesheet_t>(new tilesheet_t, destroy_tilesheet);
 
-	if (t)
+	if (rv)
 	{
-		t->m_bitmap = nullptr;
-		t->m_tile = { 0, 0 };
-		t->m_grid = { 0, 0 };
+		rv.get()->m_bitmap = nullptr;
+		rv.get()->m_tile = { 0, 0 };
+		rv.get()->m_grid = { 0, 0 };
 
-		if (parse(t, data) < 0)
+		if (parse(rv.get(), data) < 0)
 		{
-			destroy_tilesheet((void*)t);
-			t = nullptr;
+			rv.reset();
 		}
 	}
 
-	return (void*)t;
+	return std::static_pointer_cast<void>(rv);
 }
 
 void destroy_tilesheet(void* tilesheet)
@@ -318,14 +316,14 @@ int init(int argc, char** argv)
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
 	al_register_event_source(event_queue, al_get_mouse_event_source());
 
-	dlh::datafile::object::register_type(dlh::datafile::object::type_t::user_defined, "tilesheet", parse_tilesheet, destroy_tilesheet);
+	dlh::datafile::object::register_type(dlh::datafile::object::type_t::user_defined, "tilesheet", parse_tilesheet);
 
 	if (!al_generate_header_file("data\\index.ini", "include\\data.h"))
 	{
 		return -1;
 	}
 
-	data = al_load_datafile("data\\index.ini");
+	data = dlh::datafile_t::load("data\\index.ini");
 
 	if (!data)
 	{
@@ -344,11 +342,7 @@ void shutdown()
 		al_stop_timer(timer);
 	}
 
-	if (data)
-	{
-		al_destroy_datafile(data);
-		data = nullptr;
-	}
+	data.reset();
 
 	if (event_queue)
 	{
@@ -383,21 +377,23 @@ void shutdown()
 
 void draw()
 {
+	tilesheet_t* tilesheet = (data.get()->get<tilesheet_t>(0)).get();
+
 	size_t i = 40;
-	float x = (float)((i % ((tilesheet_t*)data[0].data)->m_grid.m_width) * ((tilesheet_t*)data[0].data)->m_tile.m_width);
-	float y = (float)((i / ((tilesheet_t*)data[0].data)->m_grid.m_width) * ((tilesheet_t*)data[0].data)->m_tile.m_height);
+	float x = (float)((i % (tilesheet->m_grid.m_width) * (tilesheet->m_tile.m_width)));
+	float y = (float)((i / (tilesheet->m_grid.m_width) * (tilesheet->m_tile.m_height)));
 
 	al_clear_to_color(al_map_rgb(255, 255, 255));
 
-	ALLEGRO_BITMAP* npc = ((tilesheet_t*)data[0].data)->m_bitmap;
+	ALLEGRO_BITMAP* npc = tilesheet->m_bitmap;
 
 	al_draw_scaled_bitmap(npc,
 		x, y,
-		((tilesheet_t*)data[0].data)->m_tile.m_width,
-		((tilesheet_t*)data[0].data)->m_tile.m_height,
+		(float)(tilesheet->m_tile.m_width),
+		(float)(tilesheet->m_tile.m_height),
 		100.0f, 100.0f,
-		((tilesheet_t*)data[0].data)->m_tile.m_width * 2,
-		((tilesheet_t*)data[0].data)->m_tile.m_height * 2, 0);
+		(float)(tilesheet->m_tile.m_width * 2),
+		(float)(tilesheet->m_tile.m_height * 2), 0);
 }
 
 void input()
