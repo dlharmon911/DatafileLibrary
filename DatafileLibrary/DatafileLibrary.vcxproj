@@ -154,8 +154,8 @@
     <ClCompile Include="src\d_system.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\al_datafile.h" />
     <ClInclude Include="include\datafile.h" />
+    <ClInclude Include="include\datafile\d_base.h" />
     <ClInclude Include="include\datafile\d_data.h" />
     <ClInclude Include="include\datafile\d_config.h" />
     <ClInclude Include="include\datafile\d_dson.h" />

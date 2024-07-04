@@ -216,86 +216,58 @@ namespace dlh
 			}
 		}
 	}
-}
 
-bool al_generate_header_file(const char* manifest_filename, const char* header_filename, const char sListSep)
-{
-	bool rv = false;
-	dlh::dson_t dson;
-	std::string filepath;
-	std::string base;
-	std::string ext;
-	std::string path;
-	bool archive = false;
-
-	filepath = dlh::path::make_canonical(manifest_filename);
-	dlh::path::split_filepath(filepath, path, base, ext);
-
-	const PHYSFS_ArchiveInfo** i = nullptr;
-	for (i = PHYSFS_supportedArchiveTypes(); *i != NULL; i++)
+	bool al_generate_header_file(const char* manifest_filename, const char* header_filename, const char sListSep)
 	{
-		if (dlh::string::to_upper(ext) == (*i)->extension)
+		bool rv = false;
+		dlh::dson_t dson;
+		std::string filepath;
+		std::string base;
+		std::string ext;
+		std::string path;
+		bool archive = false;
+
+		filepath = dlh::path::make_canonical(manifest_filename);
+		dlh::path::split_filepath(filepath, path, base, ext);
+
+		const PHYSFS_ArchiveInfo** i = nullptr;
+		for (i = PHYSFS_supportedArchiveTypes(); *i != NULL; i++)
 		{
-			archive = true;
-			break;
-		}
-	}
-
-	if (archive)
-	{
-		const ALLEGRO_FILE_INTERFACE* file_interface = al_get_new_file_interface();
-
-		if (PHYSFS_mount(manifest_filename, NULL, 1))
-		{
-			al_set_physfs_file_interface();
-
-			rv = dlh::dson_t::read(dson, "index.ini", sListSep);
-
-			PHYSFS_unmount(manifest_filename);
+			if (dlh::string::to_upper(ext) == (*i)->extension)
+			{
+				archive = true;
+				break;
+			}
 		}
 
-		al_set_new_file_interface(file_interface);
-	}
-	else
-	{
-		rv = dlh::dson_t::read(dson, manifest_filename, sListSep);
-	}
-
-	if (rv)
-	{
-		rv = dlh::datafile::parser::write_header(dson, manifest_filename, header_filename);
-	}
-
-	return rv;
-}
-
-void al_destroy_datafile(ALLEGRO_DATAFILE* datafile)
-{
-	if (datafile)
-	{
-		ALLEGRO_DATAFILE* object = datafile;
-
-		while (object->data)
+		if (archive)
 		{
-			object->data.reset();
-			++object;
+			const ALLEGRO_FILE_INTERFACE* file_interface = al_get_new_file_interface();
+
+			if (PHYSFS_mount(manifest_filename, NULL, 1))
+			{
+				al_set_physfs_file_interface();
+
+				rv = dlh::dson_t::read(dson, "index.ini", sListSep);
+
+				PHYSFS_unmount(manifest_filename);
+			}
+
+			al_set_new_file_interface(file_interface);
+		}
+		else
+		{
+			rv = dlh::dson_t::read(dson, manifest_filename, sListSep);
 		}
 
-		delete[] datafile;
+		if (rv)
+		{
+			rv = dlh::datafile::parser::write_header(dson, manifest_filename, header_filename);
+		}
+
+		return rv;
 	}
 }
 
-std::shared_ptr<ALLEGRO_DATAFILE> al_load_datafile(const char* filename, const char sListSep)
-{
-	std::shared_ptr<ALLEGRO_DATAFILE> afile;
-	std::shared_ptr<dlh::datafile_t> dfile = dlh::datafile_t::load(filename, sListSep);
-
-	if (dfile)
-	{
-		afile = std::shared_ptr<ALLEGRO_DATAFILE>(dlh::datafile_t::al_convert_to_allegro_datafile(dfile), al_destroy_datafile);
-	}
-
-	return afile;
-}
 
 

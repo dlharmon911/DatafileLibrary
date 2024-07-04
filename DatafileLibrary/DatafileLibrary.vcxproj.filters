@@ -68,9 +68,6 @@
     <ClInclude Include="include\datafile\d_system.h">
       <Filter>Header Files\Datafile Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\al_datafile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\datafile\d_data.h">
       <Filter>Header Files\Datafile Files</Filter>
     </ClInclude>
@@ -78,6 +75,9 @@
       <Filter>Header Files\Datafile Files</Filter>
     </ClInclude>
     <ClInclude Include="include\datafile\d_memory.h">
+      <Filter>Header Files\Datafile Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\datafile\d_base.h">
       <Filter>Header Files\Datafile Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -6,15 +6,12 @@
 #include <utility>
 #include <string>
 #include "datafile/d_memory.h"
-#include "al_datafile.h"
+#include "datafile/d_base.h"
 
 namespace dlh
 {
 	class datafile_t
 	{
-	public:
-		using value_t = std::shared_ptr<void>;
-
 	private:
 		using vector_t = std::vector<value_t>;
 
@@ -22,10 +19,10 @@ namespace dlh
 		using info_t = std::pair<int32_t, std::string>;
 
 		datafile_t();
+		datafile_t(const std::string& filename, const char sListSep = ',');
+		datafile_t(const datafile_t& datafile);
 		~datafile_t();
-
-		static std::shared_ptr<datafile_t> load(const std::string& filename, const char sListSep = ',');
-		static ALLEGRO_DATAFILE* al_convert_to_allegro_datafile(std::shared_ptr<dlh::datafile_t>& datafile);
+		datafile_t& operator = (const datafile_t& datafile);
 
 		size_t size() const;
 		bool is_empty() const;
@@ -45,10 +42,11 @@ namespace dlh
 			return std::static_pointer_cast<T>(this->m_object_data[index]);
 		}
 
-		value_t& operator[](size_t index);
-		const value_t& operator[](size_t index) const;
-		info_t& get_object_info(size_t index);
-		const info_t& get_object_info(size_t index) const;
+		void* operator[](size_t index);
+		const void* operator[](size_t index) const;
+
+		info_t& get_info(size_t index);
+		const info_t& get_info(size_t index) const;
 
 		template <typename T>
 		void push_back(int32_t type, const std::string& name, std::shared_ptr<T>& data)
@@ -124,6 +122,8 @@ namespace dlh
 		vector_t m_object_data;
 		std::vector<info_t> m_element_data;
 	};
+
+	bool al_generate_header_file(const char* manifest_filename, const char* header_filename, const char sListSep = ',');
 }
 
 #endif // !_DLH_DATAFILE_H_

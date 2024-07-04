@@ -80,7 +80,7 @@ int32_t main(int32_t argc, char** argv)
 			std::cout << "\tInput: " << data.input << "\n";
 			std::cout << "\tOutput: " << data.output << std::endl;
 
-			if (!al_generate_header_file(data.input.c_str(), data.output.c_str()))
+			if (!dlh::al_generate_header_file(data.input.c_str(), data.output.c_str()))
 			{
 				std::cout << "Error" << std::endl;
 				rv = -1;

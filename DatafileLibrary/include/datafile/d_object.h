@@ -4,6 +4,7 @@
 #include <map>
 #include "datafile/d_data.h"
 #include "datafile/d_memory.h"
+#include "datafile/d_base.h"
 
 namespace dlh
 {
@@ -23,7 +24,6 @@ namespace dlh
 				};
 			}
 
-			using value_t = std::shared_ptr<void>;
 			using parser_func_t = value_t(*)(const data_t& data);
 
 			int32_t get_type(const std::string& name);

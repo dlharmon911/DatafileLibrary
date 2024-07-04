@@ -20,7 +20,7 @@ const float DEFAULT_DISPLAY_FULLSCREEN_HEIGHT = DEFAULT_BUFFER_HEIGHT;
 ALLEGRO_DISPLAY* display = nullptr;
 ALLEGRO_TIMER* timer = nullptr;
 ALLEGRO_EVENT_QUEUE* event_queue = nullptr;
-std::shared_ptr<dlh::datafile_t> data;
+dlh::datafile_t data;
 ALLEGRO_BITMAP* buffer = nullptr;
 bool kill = false;
 
@@ -318,14 +318,14 @@ int init(int argc, char** argv)
 
 	dlh::datafile::object::register_type(dlh::datafile::object::type_t::user_defined, "tilesheet", parse_tilesheet);
 
-	if (!al_generate_header_file("data\\index.ini", "include\\data.h"))
+	if (!dlh::al_generate_header_file("data\\index.ini", "include\\data.h"))
 	{
 		return -1;
 	}
 
-	data = dlh::datafile_t::load("data\\index.ini");
+	data = dlh::datafile_t("data\\index.ini");
 
-	if (!data)
+	if (data.is_empty())
 	{
 		return -1;
 	}
@@ -342,7 +342,7 @@ void shutdown()
 		al_stop_timer(timer);
 	}
 
-	data.reset();
+	data.clear();
 
 	if (event_queue)
 	{
@@ -377,7 +377,7 @@ void shutdown()
 
 void draw()
 {
-	tilesheet_t* tilesheet = (data.get()->get<tilesheet_t>(0)).get();
+	tilesheet_t* tilesheet = (tilesheet_t*)data[0];
 
 	size_t i = 40;
 	float x = (float)((i % (tilesheet->m_grid.m_width) * (tilesheet->m_tile.m_width)));
