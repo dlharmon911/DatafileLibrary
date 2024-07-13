@@ -113,13 +113,13 @@ namespace dlh
 		return this->m_object_data[index].get();
 	}
 
-	datafile_t::info_t& datafile_t::get_object_info(size_t index)
+	datafile_t::info_t& datafile_t::get_info(size_t index)
 	{
 		ALLEGRO_ASSERT(index < this->m_element_data.size());
 		return this->m_element_data[index];
 	}
 
-	const datafile_t::info_t& datafile_t::get_object_info(size_t index) const
+	const datafile_t::info_t& datafile_t::get_info(size_t index) const
 	{
 		ALLEGRO_ASSERT(index < this->m_element_data.size());
 		return this->m_element_data[index];
